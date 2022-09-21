@@ -12,6 +12,7 @@
         <module>joker-spring-01</module>
         <module>joker-spring-02</module>
         <module>joker-spring-03</module>
+        <module>joker-spring-04</module>
     </modules>
 
     <properties>
