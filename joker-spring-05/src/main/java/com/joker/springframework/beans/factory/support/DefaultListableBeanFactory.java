@@ -1,6 +1,7 @@
 package com.joker.springframework.beans.factory.support;
 
 import com.joker.springframework.beans.BeansException;
+import com.joker.springframework.beans.factory.ConfigurableListableBeanFactory;
 import com.joker.springframework.beans.factory.config.BeanDefinition;
 
 import java.util.HashMap;
@@ -14,17 +15,39 @@ import java.util.Map;
  * @author jokerzzccc
  * @date 2022/9/18
  */
-public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory implements BeanDefinitionRegistry {
+public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory implements BeanDefinitionRegistry, ConfigurableListableBeanFactory {
 
     private Map<String, BeanDefinition> beanDefinitionMap = new HashMap<>();
 
     @Override
-    protected BeanDefinition getBeanDefinition(String beanName) throws BeansException {
-        final BeanDefinition beanDefinition = beanDefinitionMap.get(beanName);
+    public BeanDefinition getBeanDefinition(String beanName) throws BeansException {
+        BeanDefinition beanDefinition = beanDefinitionMap.get(beanName);
         if (beanDefinition == null) {
-            throw new BeansException("Bean " + beanName + " not found");
+            throw new BeansException("Bean " + beanName + " undefined");
         }
         return beanDefinition;
+    }
+
+    @Override
+    public boolean containsBeanDefinition(String beanName) throws BeansException {
+        return beanDefinitionMap.containsKey(beanName);
+    }
+
+    @Override
+    public <T> Map<String, T> getBeansOfType(Class<T> beanType) throws BeansException {
+        Map<String, T> result = new HashMap<>();
+        beanDefinitionMap.forEach((beanName, beanDefinition) -> {
+            Class beanClass = beanDefinition.getBeanClass();
+            if (beanType.isAssignableFrom(beanClass)) {
+                result.put(beanName, (T) getBean(beanName));
+            }
+        });
+        return result;
+    }
+
+    @Override
+    public String[] getBeanDefinitionNames() {
+        return beanDefinitionMap.keySet().toArray(new String[0]);
     }
 
     @Override
