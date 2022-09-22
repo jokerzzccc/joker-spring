@@ -7,10 +7,13 @@ import com.joker.springframework.beans.factory.config.BeanDefinition;
 import com.joker.springframework.beans.factory.config.BeanReference;
 import com.joker.springframework.beans.factory.support.DefaultListableBeanFactory;
 import com.joker.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import com.joker.springframework.context.support.ClassPathXmlApplicationContext;
 import com.joker.springframework.core.io.DefaultResourceReader;
 import com.joker.springframework.core.io.Resource;
 import com.joker.springframework.test.bean.UserDao;
 import com.joker.springframework.test.bean.UserService;
+import com.joker.springframework.test.common.MyBeanFactoryPostProcessor;
+import com.joker.springframework.test.common.MyBeanPostProcessor;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,75 +29,45 @@ import java.io.InputStream;
  */
 public class ApiTest {
 
-    private DefaultResourceReader resourceReader;
-
-    @Before
-    public void init() throws Exception {
-        resourceReader = new DefaultResourceReader();
-    }
-
+    /**
+     * 不用 应用上下文
+     */
     @Test
-    public void testBeanFactory() {
-        // 1.初始化 BeanFactory
-        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+    public void test_BeanFactoryPostProcessorAndBeanPostProcessor() {
+        // 1. 初始化 BeanFactory
+        final DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
 
-        // 2.UserDao 注册
-        beanFactory.registerBeanDefinition("userDao", new BeanDefinition(UserDao.class));
+        // 2. 读取配置文件 & 注册 bean
+        final XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(beanFactory);
+        reader.loadBeanDefinitions("classpath:spring.xml");
 
-        // 3. UserService 设置属性
-        final PropertyValues propertyValues = new PropertyValues();
-        propertyValues.addPropertyValue(new PropertyValue("uId", "0001"));
-        propertyValues.addPropertyValue(new PropertyValue("userDao", new BeanReference("userDao")));
+        // 3. BeanDefinition 加载完成 & bean 实例化之前， 修改 BeanDefinition 的属性值
+        final MyBeanFactoryPostProcessor myBeanFactoryPostProcessor = new MyBeanFactoryPostProcessor();
+        myBeanFactoryPostProcessor.postProcessBeanFactory(beanFactory);
 
-        // 4. UserService 注入 bean
-        BeanDefinition beanDefinition = new BeanDefinition(UserService.class, propertyValues);
-        beanFactory.registerBeanDefinition("userService", beanDefinition);
+        // 4. Bean 实例化之后，修改 Bean 属性信息
+        final MyBeanPostProcessor myBeanPostProcessor = new MyBeanPostProcessor();
+        beanFactory.addBeanPostProcessor(myBeanPostProcessor);
 
-        // 5. UserService 获取 bean
-        UserService userService = (UserService) beanFactory.getBean("userService");
-        userService.queryUserInfo();
-    }
+        // 5. 获取 Bean 对象调用方法
+        final UserService userService = beanFactory.getBean("userService", UserService.class);
+        final String result = userService.queryUserInfo();
+        System.out.println("测试结果：" + result);
 
-    @Test
-    public void test_classPath() throws Exception {
-        Resource resource = resourceReader.getResource("classpath:important.properties");
-        InputStream inputStream = resource.getInputStream();
-        String content = IoUtil.readUtf8(inputStream);
-        System.out.println(content);
-    }
-
-    @Test
-    public void test_file() throws Exception {
-        Resource resource = resourceReader.getResource("src/resources/important.properties");
-        InputStream inputStream = resource.getInputStream();
-        String content = IoUtil.readUtf8(inputStream);
-        System.out.println(content);
-    }
-
-    @Test
-    public void test_url() throws Exception {
-        Resource resource = resourceReader.getResource("https://github.com/fuzhengwei/small-spring/important.properties");
-        InputStream inputStream = resource.getInputStream();
-        String content = IoUtil.readUtf8(inputStream);
-        System.out.println(content);
     }
 
     /**
-     * 测试：配置文件注册 bean
+     * 测试：使用应用上下文
      *
      * @throws Exception
      */
     @Test
     public void test_xml() throws Exception {
         // 1. 初始化 BeanFactory
-        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
-        // 2. 读取配置文件 & 注册 bean
-        final XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(beanFactory);
-        reader.loadBeanDefinitions("classpath:spring.xml");
-
-        // 3. 读取 bean 对象调用方法
-        UserService userService = beanFactory.getBean("userService", UserService.class);
-        final String result = userService.queryUserInfo();
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:springPostProcessor.xml");
+        // 2. 获取 bean 对象调用方法
+        UserService userService = applicationContext.getBean("userService", UserService.class);
+        String result = userService.queryUserInfo();
         System.out.println("测试结果：" + result);
     }
 
