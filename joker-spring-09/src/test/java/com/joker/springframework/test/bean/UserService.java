@@ -13,11 +13,7 @@ import com.joker.springframework.context.ApplicationContextAware;
  * @author jokerzzccc
  * @date 2022/9/18
  */
-public class UserService implements BeanNameAware, BeanClassLoaderAware, ApplicationContextAware, BeanFactoryAware {
-
-    private ApplicationContext applicationContext;
-
-    private BeanFactory beanFactory;
+public class UserService {
 
     private String uId;
 
@@ -25,30 +21,10 @@ public class UserService implements BeanNameAware, BeanClassLoaderAware, Applica
 
     private String location;
 
-    private UserDao userDao;
+    private IUserDao userDao;
 
     public String queryUserInfo() {
         return userDao.queryUserName(uId) + ", company: " + company + ", location: " + location;
-    }
-
-    @Override
-    public void setBeanClassLoader(ClassLoader classLoader) {
-        System.out.println("ClassLoader: " + classLoader);
-    }
-
-    @Override
-    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-        this.beanFactory = beanFactory;
-    }
-
-    @Override
-    public void setBeanName(String beanName) {
-        System.out.println("Bean name is " + beanName);
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
     }
 
     public String getuId() {
@@ -75,20 +51,12 @@ public class UserService implements BeanNameAware, BeanClassLoaderAware, Applica
         this.location = location;
     }
 
-    public UserDao getUserDao() {
+    public IUserDao getUserDao() {
         return userDao;
     }
 
-    public void setUserDao(UserDao userDao) {
+    public void setUserDao(IUserDao userDao) {
         this.userDao = userDao;
-    }
-
-    public ApplicationContext getApplicationContext() {
-        return applicationContext;
-    }
-
-    public BeanFactory getBeanFactory() {
-        return beanFactory;
     }
 
 }

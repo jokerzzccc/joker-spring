@@ -4,6 +4,7 @@ import com.joker.springframework.beans.PropertyValue;
 import com.joker.springframework.beans.PropertyValues;
 import com.joker.springframework.beans.factory.DisposableBean;
 import com.joker.springframework.beans.factory.InitializingBean;
+import org.omg.CORBA.PRIVATE_MEMBER;
 
 /**
  * <p>
@@ -15,6 +16,10 @@ import com.joker.springframework.beans.factory.InitializingBean;
  */
 public class BeanDefinition {
 
+    String SCOPE_SINGLETON = ConfigurableBeanFactory.SCOPE_SINGLETON;
+
+    String SCOPE_PROTOTYPE = ConfigurableBeanFactory.SCOPE_PROTOTYPE;
+
     private Class beanClass;
 
     private PropertyValues propertyValues;
@@ -22,6 +27,12 @@ public class BeanDefinition {
     private String InitMethodName;
 
     private String destroyMethodName;
+
+    private String scope = SCOPE_SINGLETON;
+
+    private boolean singleton = true;
+
+    private boolean prototype = false;
 
     public BeanDefinition(Class beanClass) {
         this.beanClass = beanClass;
@@ -31,6 +42,20 @@ public class BeanDefinition {
     public BeanDefinition(Class beanClass, PropertyValues propertyValues) {
         this.beanClass = beanClass;
         this.propertyValues = propertyValues != null ? propertyValues : new PropertyValues();
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
+        this.singleton = SCOPE_SINGLETON.equals(scope);
+        this.prototype = SCOPE_PROTOTYPE.equals(scope);
+    }
+
+    public boolean isSingleton() {
+        return singleton;
+    }
+
+    public boolean isPrototype() {
+        return prototype;
     }
 
     public Class getBeanClass() {
