@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans>
 
-    <bean id="userDao" class="com.joker.springframework.test.bean.UserDao"/>
+    <bean id="userDao" class="com.joker.springframework.test.bean.UserDao" init-method="initDataMethod"
+          destory-method="destroyDataMethod"/>
 
     <bean id="userService" class="com.joker.springframework.test.bean.UserService">
         <property name="uId" value="0001"/>

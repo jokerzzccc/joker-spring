@@ -1,5 +1,8 @@
 package com.joker.springframework.test.bean;
 
+import com.joker.springframework.beans.factory.DisposableBean;
+import com.joker.springframework.beans.factory.InitializingBean;
+
 /**
  * <p>
  *
@@ -8,7 +11,7 @@ package com.joker.springframework.test.bean;
  * @author jokerzzccc
  * @date 2022/9/18
  */
-public class UserService {
+public class UserService implements InitializingBean, DisposableBean {
 
     private String uId;
 
@@ -20,6 +23,16 @@ public class UserService {
 
     public String queryUserInfo() {
         return userDao.queryUserName(uId) + "," + company + "," + location;
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        System.out.println("执行：UserService.destroy");
+    }
+
+    @Override
+    public void addPropertiesSet() throws Exception {
+        System.out.println("执行：UserService.addPropertiesSet");
     }
 
     public String getuId() {

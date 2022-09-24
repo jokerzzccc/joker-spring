@@ -86,4 +86,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceReader i
         return getBeanFactory().getBean(name, requiredType);
     }
 
+    @Override
+    public void registerShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+    }
+
+    @Override
+    public void close() {
+        getBeanFactory().destroySingletons();
+    }
+
 }
