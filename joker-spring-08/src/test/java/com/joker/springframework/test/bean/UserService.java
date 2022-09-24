@@ -1,7 +1,9 @@
 package com.joker.springframework.test.bean;
 
-import com.joker.springframework.beans.factory.DisposableBean;
-import com.joker.springframework.beans.factory.InitializingBean;
+import com.joker.springframework.beans.BeansException;
+import com.joker.springframework.beans.factory.*;
+import com.joker.springframework.context.ApplicationContext;
+import com.joker.springframework.context.ApplicationContextAware;
 
 /**
  * <p>
@@ -11,7 +13,11 @@ import com.joker.springframework.beans.factory.InitializingBean;
  * @author jokerzzccc
  * @date 2022/9/18
  */
-public class UserService implements InitializingBean, DisposableBean {
+public class UserService implements BeanNameAware, BeanClassLoaderAware, ApplicationContextAware, BeanFactoryAware {
+
+    private ApplicationContext applicationContext;
+
+    private BeanFactory beanFactory;
 
     private String uId;
 
@@ -22,17 +28,27 @@ public class UserService implements InitializingBean, DisposableBean {
     private UserDao userDao;
 
     public String queryUserInfo() {
-        return userDao.queryUserName(uId) + "," + company + "," + location;
+        return userDao.queryUserName(uId) + ", company: " + company + ", location: " + location;
     }
 
     @Override
-    public void destroy() throws Exception {
-        System.out.println("执行：UserService.destroy");
+    public void setBeanClassLoader(ClassLoader classLoader) {
+        System.out.println("ClassLoader: " + classLoader);
     }
 
     @Override
-    public void addPropertiesSet() throws Exception {
-        System.out.println("执行：UserService.addPropertiesSet");
+    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+        this.beanFactory = beanFactory;
+    }
+
+    @Override
+    public void setBeanName(String beanName) {
+        System.out.println("Bean name is " + beanName);
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 
     public String getuId() {
@@ -65,6 +81,14 @@ public class UserService implements InitializingBean, DisposableBean {
 
     public void setUserDao(UserDao userDao) {
         this.userDao = userDao;
+    }
+
+    public ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
+
+    public BeanFactory getBeanFactory() {
+        return beanFactory;
     }
 
 }

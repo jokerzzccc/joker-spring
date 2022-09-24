@@ -13,7 +13,7 @@ import com.joker.springframework.beans.BeansException;
 public interface ConfigurableApplicationContext extends ApplicationContext {
 
     /**
-     * 刷新容器
+     * 刷新容器：refresh 方法就是整个 spring 容器的操作过程。
      *
      * @throws BeansException
      */

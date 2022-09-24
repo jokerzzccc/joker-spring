@@ -9,6 +9,7 @@ package com.joker.springframework.beans.factory;
  * @date 2022/9/23
  */
 public interface DisposableBean {
+
     void destroy() throws Exception;
 
 }

@@ -5,6 +5,7 @@ import com.joker.springframework.beans.factory.BeanFactory;
 import com.joker.springframework.beans.factory.config.BeanDefinition;
 import com.joker.springframework.beans.factory.config.BeanPostProcessor;
 import com.joker.springframework.beans.factory.config.ConfigurableBeanFactory;
+import com.joker.springframework.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,11 @@ import java.util.List;
  * @date 2022/9/18
  */
 public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements ConfigurableBeanFactory {
+
+    /**
+     * ClassLoader to resolve bean class names with, if necessary
+     */
+    private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
     /**
      * BeanPostProcessors to apply in createBean
@@ -66,6 +72,10 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
      */
     public List<BeanPostProcessor> getBeanPostProcessors() {
         return this.beanPostProcessors;
+    }
+
+    public ClassLoader getBeanClassLoader() {
+        return this.beanClassLoader;
     }
 
 }
