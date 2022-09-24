@@ -17,6 +17,7 @@
         <module>joker-spring-06</module>
         <module>joker-spring-07</module>
         <module>joker-spring-08</module>
+        <module>joker-spring-09</module>
     </modules>
 
     <properties>
