@@ -1,6 +1,8 @@
 package com.joker.springframework.context;
 
+import com.joker.springframework.beans.factory.HierarchicalBeanFactory;
 import com.joker.springframework.beans.factory.ListableBeanFactory;
+import com.joker.springframework.core.io.ResourceLoader;
 
 /**
  * <p>
@@ -10,6 +12,6 @@ import com.joker.springframework.beans.factory.ListableBeanFactory;
  * @author jokerzzccc
  * @date 2022/9/21
  */
-public interface ApplicationContext extends ListableBeanFactory {
+public interface ApplicationContext extends ListableBeanFactory, HierarchicalBeanFactory, ResourceLoader, ApplicationEventPublisher {
 
 }
