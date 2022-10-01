@@ -1,7 +1,8 @@
 package com.joker.springframework.beans.factory.support;
 
-import com.joker.springframework.core.io.DefaultResourceReader;
+import com.joker.springframework.core.io.DefaultResourceLoader;
 import com.joker.springframework.core.io.ResourceLoader;
+import com.sun.istack.internal.Nullable;
 
 /**
  * <p>
@@ -15,13 +16,14 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 
     private final BeanDefinitionRegistry registry;
 
+    @Nullable
     private ResourceLoader resourceLoader;
 
     protected AbstractBeanDefinitionReader(BeanDefinitionRegistry registry) {
-        this(registry, new DefaultResourceReader());
+        this(registry, new DefaultResourceLoader());
     }
 
-    public AbstractBeanDefinitionReader(BeanDefinitionRegistry registry, ResourceLoader resourceLoader) {
+    protected AbstractBeanDefinitionReader(BeanDefinitionRegistry registry, ResourceLoader resourceLoader) {
         this.registry = registry;
         this.resourceLoader = resourceLoader;
     }

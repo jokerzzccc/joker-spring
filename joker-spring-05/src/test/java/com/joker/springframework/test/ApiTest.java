@@ -7,7 +7,7 @@ import com.joker.springframework.beans.factory.config.BeanDefinition;
 import com.joker.springframework.beans.factory.config.BeanReference;
 import com.joker.springframework.beans.factory.support.DefaultListableBeanFactory;
 import com.joker.springframework.beans.factory.xml.XmlBeanDefinitionReader;
-import com.joker.springframework.core.io.DefaultResourceReader;
+import com.joker.springframework.core.io.DefaultResourceLoader;
 import com.joker.springframework.core.io.Resource;
 import com.joker.springframework.test.bean.UserDao;
 import com.joker.springframework.test.bean.UserService;
@@ -26,11 +26,11 @@ import java.io.InputStream;
  */
 public class ApiTest {
 
-    private DefaultResourceReader resourceReader;
+    private DefaultResourceLoader resourceReader;
 
     @Before
     public void init() throws Exception {
-        resourceReader = new DefaultResourceReader();
+        resourceReader = new DefaultResourceLoader();
     }
 
     @Test
