@@ -1,9 +1,6 @@
 package com.joker.springframework.beans.factory.config;
 
-import com.joker.springframework.beans.PropertyValue;
 import com.joker.springframework.beans.PropertyValues;
-import com.joker.springframework.beans.factory.DisposableBean;
-import com.joker.springframework.beans.factory.InitializingBean;
 
 /**
  * <p>
@@ -19,7 +16,7 @@ public class BeanDefinition {
 
     private PropertyValues propertyValues;
 
-    private String InitMethodName;
+    private String initMethodName;
 
     private String destroyMethodName;
 
@@ -50,11 +47,11 @@ public class BeanDefinition {
     }
 
     public String getInitMethodName() {
-        return InitMethodName;
+        return initMethodName;
     }
 
     public void setInitMethodName(String initMethodName) {
-        InitMethodName = initMethodName;
+        this.initMethodName = initMethodName;
     }
 
     public String getDestroyMethodName() {

@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.joker.springframework.beans.BeansException;
 import com.joker.springframework.beans.factory.DisposableBean;
 import com.joker.springframework.beans.factory.config.BeanDefinition;
+import com.sun.istack.internal.Nullable;
 
 import java.lang.reflect.Method;
 
@@ -21,6 +22,7 @@ public class DisposableBeanAdapter implements DisposableBean {
 
     private final String beanName;
 
+    @Nullable
     private String destroyMethodName;
 
     public DisposableBeanAdapter(Object bean, String beanName, BeanDefinition beanDefinition) {
