@@ -15,7 +15,7 @@ import java.util.Map;
 public interface ListableBeanFactory extends BeanFactory {
 
     /**
-     * 按照类型返回 bena 实例
+     * 按照类型返回 bean 实例
      * @param beanType
      * @param <T>
      * @return

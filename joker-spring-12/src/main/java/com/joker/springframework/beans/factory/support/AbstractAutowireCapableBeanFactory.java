@@ -7,10 +7,7 @@ import com.joker.springframework.beans.BeansException;
 import com.joker.springframework.beans.PropertyValue;
 import com.joker.springframework.beans.PropertyValues;
 import com.joker.springframework.beans.factory.*;
-import com.joker.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import com.joker.springframework.beans.factory.config.BeanDefinition;
-import com.joker.springframework.beans.factory.config.BeanPostProcessor;
-import com.joker.springframework.beans.factory.config.BeanReference;
+import com.joker.springframework.beans.factory.config.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -31,6 +28,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     protected Object createBean(String beanName, BeanDefinition beanDefinition, Object[] args) {
         Object bean = null;
         try {
+            // 判断是否返回代理 Bean 对象
+            // Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
+            bean = resolveBeforeInstantiation(beanName, beanDefinition);
+            if (null != bean) {
+                return bean;
+            }
+            // 实例化 bean
             bean = createBeanInstance(beanDefinition, beanName, args);
             //  给 bean 填充属性
             applyPropertyValues(beanName, bean, beanDefinition);
@@ -47,6 +51,44 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             registerSingleton(beanName, bean);
         }
         return bean;
+    }
+
+    /**
+     * Apply before-instantiation post-processors, resolving whether there is a
+     * before-instantiation shortcut for the specified bean.
+     *
+     * @param beanName the name of the bean
+     * @param beanDefinition the bean definition for the bean
+     * @return the shortcut-determined bean instance, or {@code null} if none
+     */
+    protected Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {
+        Object bean = applyBeanPostProcessorsBeforeInstantiation(beanDefinition.getBeanClass(), beanName);
+        if (null != bean) {
+            bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
+        }
+        return bean;
+    }
+
+    /**
+     * Apply InstantiationAwareBeanPostProcessors to the specified bean definition
+     * (by class and name), invoking their {@code postProcessBeforeInstantiation} methods.
+     * <p>Any returned object will be used as the bean instead of actually instantiating
+     * the target bean. A {@code null} return value from the post-processor will
+     * result in the target bean being instantiated.
+     *
+     * @param beanClass the class of the bean to be instantiated
+     * @param beanName the name of the bean
+     * @return the bean object to use instead of a default instance of the target bean, or {@code null}
+     * @see InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation
+     */
+    protected Object applyBeanPostProcessorsBeforeInstantiation(Class<?> beanClass, String beanName) {
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                Object result = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessBeforeInstantiation(beanClass, beanName);
+                if (null != result) return result;
+            }
+        }
+        return null;
     }
 
     protected void registerDisposableBeanIfNecessary(String beanName, Object bean, BeanDefinition beanDefinition) {
@@ -95,7 +137,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                 BeanUtil.setFieldValue(bean, name, value);
             }
         } catch (Exception e) {
-            throw new BeansException("Error setting property values: " + beanName);
+            throw new BeansException("Error setting property values: " + beanName, e);
         }
     }
 

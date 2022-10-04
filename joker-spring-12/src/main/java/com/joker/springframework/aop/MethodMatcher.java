@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 
 /**
  * <p>
- * Part of a {@link PointCut}: Checks whether the target method is eligible for advice.
+ * Part of a {@link Pointcut}: Checks whether the target method is eligible for advice.
  * </p>
  *
  * @author jokerzzccc

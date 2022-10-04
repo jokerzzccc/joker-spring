@@ -1,16 +1,23 @@
 package com.joker.springframework.test;
 
 import com.joker.springframework.aop.AdvisedSupport;
+import com.joker.springframework.aop.ClassFilter;
 import com.joker.springframework.aop.MethodMatcher;
 import com.joker.springframework.aop.TargetSource;
 import com.joker.springframework.aop.aspectj.AspectJExpressionPointcut;
+import com.joker.springframework.aop.aspectj.AspectJExpressionPointcutAdvisor;
 import com.joker.springframework.aop.framework.Cglib2AopProxy;
 import com.joker.springframework.aop.framework.JdkDynamicAopProxy;
+import com.joker.springframework.aop.framework.ProxyFactory;
 import com.joker.springframework.aop.framework.ReflectiveMethodInvocation;
+import com.joker.springframework.aop.framework.adapter.MethodBeforeAdviceInterceptor;
+import com.joker.springframework.context.support.ClassPathXmlApplicationContext;
 import com.joker.springframework.test.bean.IUserService;
 import com.joker.springframework.test.bean.UserService;
+import com.joker.springframework.test.bean.UserServiceBeforeAdvice;
 import com.joker.springframework.test.bean.UserServiceInterceptor;
 import org.aopalliance.intercept.MethodInterceptor;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationHandler;
@@ -23,59 +30,69 @@ import java.lang.reflect.Proxy;
  */
 public class ApiTest {
 
-    /**
-     * 解耦之后，动态代理方法的实现
-     */
-    @Test
-    public void test_dynamic() {
-        // 目标对象
-        final UserService userService = new UserService();
+    private AdvisedSupport advisedSupport;
 
+    @Before
+    public void init() {
+        // 目标对象
+        UserService userService = new UserService();
         // 组装代理信息
-        final AdvisedSupport advisedSupport = new AdvisedSupport();
+        advisedSupport = new AdvisedSupport();
         advisedSupport.setTargetSource(new TargetSource(userService));
         advisedSupport.setMethodInterceptor(new UserServiceInterceptor());
         advisedSupport.setMethodMatcher(new AspectJExpressionPointcut("execution(* com.joker.springframework.test.bean.IUserService" +
                 ".*(..))"));
-
-        // 代理方式一： 代理对象（JDK 代理)
-        final IUserService proxy_jdk = (IUserService) new JdkDynamicAopProxy(advisedSupport).getProxy();
-        // 测试调用
-        System.out.println("测试结果：" + proxy_jdk.queryUserInfo());
-
-        System.out.println("================================================================");
-
-        // 代理方式二： 代理对象（Cglib 代理)
-        final IUserService proxy_cglib = (IUserService) new Cglib2AopProxy(advisedSupport).getProxy();
-        // 测试调用
-        System.out.println("测试结果：" + proxy_cglib.register("jokerzzccc"));
-
     }
 
-    /**
-     * 测试使用 Proxy.newProxyInstance() 代理方法是否成功
-     */
     @Test
-    public void test_proxy_class() {
-        IUserService userService = (IUserService) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class[]{IUserService.class}, (proxy, method, args) -> "你被代理了！");
-        String result = userService.queryUserInfo();
-        System.out.println("测试结果：" + result);
+    public void test_proxyFactory() {
+        advisedSupport.setProxyTargetClass(false);
+        final IUserService proxy = (IUserService) new ProxyFactory(advisedSupport).getProxy();
+        System.out.println("代理工厂测试结果：" + proxy.queryUserInfo());
     }
 
-    /**
-     * 匹配方法的验证测试：查看拦截的方法与对应的对象是否匹配
-     *
-     * @throws NoSuchMethodException
-     */
+    @Test
+    public void test_beforeAdvice() {
+        final UserServiceBeforeAdvice beforeAdvice = new UserServiceBeforeAdvice();
+        final MethodBeforeAdviceInterceptor interceptor = new MethodBeforeAdviceInterceptor(beforeAdvice);
+        advisedSupport.setMethodInterceptor(interceptor);
+
+        IUserService proxy = (IUserService) new ProxyFactory(advisedSupport).getProxy();
+        System.out.println("beforeAdvice 测试结果：" + proxy.queryUserInfo());
+    }
+
+    @Test
+    public void test_advisor() {
+        // 目标对象
+        final UserService userService = new UserService();
+
+        final AspectJExpressionPointcutAdvisor advisor = new AspectJExpressionPointcutAdvisor();
+        advisor.setExpression("execution(* com.joker.springframework.test.bean.IUserService.*(..))");
+        advisor.setAdvice(new MethodBeforeAdviceInterceptor(new UserServiceBeforeAdvice()));
+
+        final ClassFilter classFilter = advisor.getPointcut().getClassFilter();
+        if (classFilter.matches(userService.getClass())) {
+            final AdvisedSupport advisedSupport = new AdvisedSupport();
+            final TargetSource targetSource = new TargetSource(userService);
+
+            advisedSupport.setTargetSource(targetSource);
+            advisedSupport.setMethodInterceptor((MethodInterceptor) advisor.getAdvice());
+            advisedSupport.setMethodMatcher(advisor.getPointcut().getMethodMatcher());
+            // false/true，JDK动态代理、CGlib动态代理
+            advisedSupport.setProxyTargetClass(true);
+
+            IUserService proxy = (IUserService) new ProxyFactory(advisedSupport).getProxy();
+            System.out.println("advisor 测试结果：" + proxy.queryUserInfo());
+        }
+
+    }
+
     @Test
     public void test_aop() throws NoSuchMethodException {
-        AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut("execution(* com.joker.springframework.test.bean.UserService.*(..))");
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
 
-        Class<UserService> clazz = UserService.class;
-        Method method = clazz.getDeclaredMethod("queryUserInfo");
-
-        System.out.println(pointcut.matches(clazz));
-        System.out.println(pointcut.matches(method, clazz));
+        IUserService userService = applicationContext.getBean("userService", IUserService.class);
+        System.out.println("AOP 融进 Spring 动态代理测试结果：" + userService.queryUserInfo());
     }
 
     /**

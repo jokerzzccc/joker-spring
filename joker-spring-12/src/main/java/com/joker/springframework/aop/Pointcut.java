@@ -13,7 +13,7 @@ package com.joker.springframework.aop;
  * @author jokerzzccc
  * @date 2022/10/3
  */
-public interface PointCut {
+public interface Pointcut {
 
     /**
      * Return the ClassFilter for this pointcut.

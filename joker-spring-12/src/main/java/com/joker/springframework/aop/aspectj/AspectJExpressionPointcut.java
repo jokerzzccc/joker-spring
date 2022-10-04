@@ -2,7 +2,7 @@ package com.joker.springframework.aop.aspectj;
 
 import com.joker.springframework.aop.ClassFilter;
 import com.joker.springframework.aop.MethodMatcher;
-import com.joker.springframework.aop.PointCut;
+import com.joker.springframework.aop.Pointcut;
 import org.aspectj.weaver.tools.PointcutExpression;
 import org.aspectj.weaver.tools.PointcutParser;
 import org.aspectj.weaver.tools.PointcutPrimitive;
@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Spring {@link PointCut} implementation
+ * Spring {@link Pointcut} implementation
  * that uses the AspectJ weaver to evaluate a pointcut expression.
  * <p>
  * 计算切点表达式
@@ -21,7 +21,7 @@ import java.util.Set;
  * @author jokerzzccc
  * @date 2022/10/3
  */
-public class AspectJExpressionPointcut implements PointCut, ClassFilter, MethodMatcher {
+public class AspectJExpressionPointcut implements Pointcut, ClassFilter, MethodMatcher {
 
     private static final Set<PointcutPrimitive> SUPPORTED_PRIMITIVES = new HashSet<>();
 
