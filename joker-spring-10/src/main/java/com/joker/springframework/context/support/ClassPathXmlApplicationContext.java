@@ -15,6 +15,9 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 
     private String[] configLocations;
 
+    public ClassPathXmlApplicationContext() {
+    }
+
     /**
      * 从 XML 中加载 BeanDefinition, 并刷新上下文
      *
