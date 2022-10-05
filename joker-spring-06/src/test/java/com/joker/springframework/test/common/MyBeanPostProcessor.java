@@ -16,7 +16,7 @@ import com.joker.springframework.test.bean.UserService;
 public class MyBeanPostProcessor implements BeanPostProcessor {
 
     @Override
-    public Object postProcessBeforeInstantiation(Object bean, String beanName) throws BeansException {
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         if ("userService".equals(beanName)) {
             UserService userService = (UserService) bean;
             userService.setLocation("改为：重庆");
@@ -25,7 +25,7 @@ public class MyBeanPostProcessor implements BeanPostProcessor {
     }
 
     @Override
-    public Object postProcessAfterInstantiation(Object bean, String beanName) throws BeansException {
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         return bean;
     }
 
