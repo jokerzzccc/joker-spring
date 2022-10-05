@@ -17,7 +17,7 @@ import org.aopalliance.intercept.MethodInvocation;
  */
 public class MethodBeforeAdviceInterceptor implements MethodInterceptor {
 
-    private MethodBeforeAdvice advice;
+        private MethodBeforeAdvice advice;
 
     public MethodBeforeAdviceInterceptor() {
     }

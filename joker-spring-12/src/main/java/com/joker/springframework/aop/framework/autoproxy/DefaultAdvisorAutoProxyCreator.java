@@ -76,7 +76,7 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
      * @param beanClass
      * @return
      */
-    private boolean isInfrastructureClass(Class<?> beanClass) {
+        private boolean isInfrastructureClass(Class<?> beanClass) {
         return Advice.class.isAssignableFrom(beanClass)
                 || Pointcut.class.isAssignableFrom(beanClass)
                 || Advisor.class.isAssignableFrom(beanClass);
