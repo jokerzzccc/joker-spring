@@ -1,5 +1,7 @@
 package com.joker.springframework.test.bean;
 
+import com.joker.springframework.beans.factory.annotation.Autowired;
+import com.joker.springframework.beans.factory.annotation.Value;
 import com.joker.springframework.stereotype.Component;
 
 import java.util.Random;
@@ -15,7 +17,11 @@ import java.util.Random;
 @Component("userService")
 public class UserService implements IUserService {
 
+    @Value("${token}")
     private String token;
+
+    @Autowired
+    private UserDao userDao;
 
     @Override
     public String queryUserInfo() {
@@ -24,7 +30,7 @@ public class UserService implements IUserService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return "jokerzzccc, 0001, 成都";
+        return userDao.queryUserName("0001") + "," + token;
     }
 
     @Override
@@ -43,6 +49,14 @@ public class UserService implements IUserService {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public UserDao getUserDao() {
+        return userDao;
+    }
+
+    public void setUserDao(UserDao userDao) {
+        this.userDao = userDao;
     }
 
     @Override

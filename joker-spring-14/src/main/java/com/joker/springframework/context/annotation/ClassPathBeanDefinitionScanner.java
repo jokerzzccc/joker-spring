@@ -1,6 +1,7 @@
 package com.joker.springframework.context.annotation;
 
 import cn.hutool.core.util.StrUtil;
+import com.joker.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import com.joker.springframework.beans.factory.config.BeanDefinition;
 import com.joker.springframework.beans.factory.support.BeanDefinitionRegistry;
 import com.joker.springframework.stereotype.Component;
@@ -41,9 +42,12 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
                     beanDefinition.setScope(beanScope);
                 }
                 registry.registerBeanDefinition(determineBeanName(beanDefinition), beanDefinition);
-
             }
         }
+
+        // 注册处理注解的 BeanPostProcessor (@Autowired, @Value)
+        registry.registerBeanDefinition("com.joker.springframework.context.annotation.internalAutowiredAnnotationProcessor"
+                , new BeanDefinition(AutowiredAnnotationBeanPostProcessor.class));
     }
 
     /**

@@ -17,6 +17,10 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
+ * Abstract implementation of the {@link com.joker.springframework.context.ApplicationContext}
+ * interface. Doesn't mandate the type of storage used for configuration; simply
+ * implements common context functionality. Uses the Template Method design pattern,
+ * requiring concrete subclasses to implement abstract methods.
  * <p>
  * 应用上下文抽象类实现
  * </p>
@@ -124,6 +128,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceReader i
     @Override
     public <T> T getBean(String name, Class<T> requiredType) throws BeansException {
         return getBeanFactory().getBean(name, requiredType);
+    }
+
+    @Override
+    public <T> T getBean(Class<T> requiredType) throws BeansException {
+        return getBeanFactory().getBean(requiredType);
     }
 
     @Override

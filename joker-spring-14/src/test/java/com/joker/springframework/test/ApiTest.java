@@ -16,48 +16,13 @@ import java.util.List;
 public class ApiTest {
 
     /**
-     * 测试包扫描
+     * 测试注解注入属性和对象
      */
     @Test
     public void test_scan() {
-        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring-scan.xml");
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
         IUserService userService = applicationContext.getBean("userService", IUserService.class);
-        System.out.println("包扫描 测试结果：" + userService.queryUserInfo());
-    }
-
-    /**
-     * 测试占位符
-     */
-    @Test
-    public void test_property() {
-        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring-property.xml");
-        IUserService userService = applicationContext.getBean("userService", IUserService.class);
-        System.out.println("占位符 测试结果：" + userService);
-    }
-
-    /**
-     * 测试 BeanPostProcessor 的使用
-     */
-    @Test
-    public void test_beanPost(){
-        BeanPostProcessor beanPostProcessor = new BeanPostProcessor() {
-            @Override
-            public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-                return null;
-            }
-
-            @Override
-            public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-                return null;
-            }
-        };
-
-        List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
-        beanPostProcessors.add(beanPostProcessor);
-        beanPostProcessors.add(beanPostProcessor);
-        beanPostProcessors.remove(beanPostProcessor);
-
-        System.out.println(beanPostProcessors.size());
+        System.out.println("注解注入属性和对象 测试结果：" + userService.queryUserInfo());
     }
 
 }
