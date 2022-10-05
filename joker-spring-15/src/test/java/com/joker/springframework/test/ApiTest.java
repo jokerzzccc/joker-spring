@@ -16,13 +16,13 @@ import java.util.List;
 public class ApiTest {
 
     /**
-     * 测试注解注入属性和对象
+     * 测试代理对象属性注入
      */
     @Test
-    public void test_scan() {
+    public void test_autoProxy() {
         ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
         IUserService userService = applicationContext.getBean("userService", IUserService.class);
-        System.out.println("注解注入属性和对象 测试结果：" + userService.queryUserInfo());
+        System.out.println("测试结果：" + userService.queryUserInfo());
     }
 
 }

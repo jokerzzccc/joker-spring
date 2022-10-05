@@ -13,6 +13,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 /**
+ * Abstract bean factory superclass that implements default bean creation,
+ * with the full capabilities specified by the class.
+ * Implements the {@link com.joker.springframework.beans.factory.config.AutowireCapableBeanFactory}
+ * interface in addition to AbstractBeanFactory's {@link #createBean} method.
  * <p>
  * 实现了 bean 的实例化操作： 创建可用的 bean
  * </p>
@@ -36,6 +40,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             }
             // 实例化 bean
             bean = createBeanInstance(beanDefinition, beanName, args);
+            // 实例化后判断, 是否是代理对象，是，就不执行属性填充。
+            boolean continueWithPropertyPopulation = applyBeanPostProcessorsAfterInstantiation(beanName, bean);
+            if (!continueWithPropertyPopulation) {
+                return bean;
+            }
             // 在设置 Bean 属性之前，允许 BeanPostProcessor 修改属性值
             applyBeanPostProcessorsBeforeApplyingPropertyValues(beanName, bean, beanDefinition);
             //  给 bean 填充属性
@@ -56,6 +65,27 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     }
 
     /**
+     * Bean 实例化后返回 false 的对象，不再执行后续设置 Bean 对象属性的操作
+     *
+     * @param beanName
+     * @param bean
+     * @return
+     */
+    private boolean applyBeanPostProcessorsAfterInstantiation(String beanName, Object bean) {
+        boolean continueWithPropertyPopulation = true;
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                InstantiationAwareBeanPostProcessor instantiationAwareBeanPostProcessor = (InstantiationAwareBeanPostProcessor) beanPostProcessor;
+                if (!instantiationAwareBeanPostProcessor.postProcessAfterInstantiation(bean, beanName)) {
+                    continueWithPropertyPopulation = false;
+                    break;
+                }
+            }
+        }
+        return continueWithPropertyPopulation;
+    }
+
+    /**
      * 在设置 Bean 属性之前，允许 BeanPostProcessor 修改属性值
      *
      * @param beanName
@@ -73,7 +103,6 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                 }
             }
         }
-
     }
 
     /**

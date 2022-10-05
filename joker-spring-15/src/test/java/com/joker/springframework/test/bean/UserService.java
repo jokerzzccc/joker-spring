@@ -14,14 +14,9 @@ import java.util.Random;
  * @author jokerzzccc
  * @date 2022/10/4
  */
-@Component("userService")
 public class UserService implements IUserService {
 
-    @Value("${token}")
     private String token;
-
-    @Autowired
-    private UserDao userDao;
 
     @Override
     public String queryUserInfo() {
@@ -30,7 +25,7 @@ public class UserService implements IUserService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return userDao.queryUserName("0001") + "," + token;
+        return "info: { jokerzzccc,0001, laughTale }" + ", token: " + token;
     }
 
     @Override
@@ -51,13 +46,6 @@ public class UserService implements IUserService {
         this.token = token;
     }
 
-    public UserDao getUserDao() {
-        return userDao;
-    }
-
-    public void setUserDao(UserDao userDao) {
-        this.userDao = userDao;
-    }
 
     @Override
     public String toString() {
