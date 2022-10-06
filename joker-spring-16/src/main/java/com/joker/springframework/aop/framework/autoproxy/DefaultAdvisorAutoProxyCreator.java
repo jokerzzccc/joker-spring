@@ -17,6 +17,9 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aspectj.weaver.patterns.Pointcut;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * {@code BeanPostProcessor} implementation that creates AOP proxies based on all
@@ -35,6 +38,8 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
 
     private DefaultListableBeanFactory beanFactory;
 
+    private final Set<Object> earlyProxyReferences = Collections.synchronizedSet(new HashSet<>());
+
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
         this.beanFactory = (DefaultListableBeanFactory) beanFactory;
@@ -51,6 +56,10 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
     }
 
     /**
+     * Return whether the given bean class represents an infrastructure class
+     * that should never be proxied.
+     * <p>The default implementation considers Advices, Advisors and
+     * AopInfrastructureBeans as infrastructure classes.
      * 判断是否是 AOP 相关的子类
      *
      * @param beanClass
@@ -69,9 +78,24 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        if (!earlyProxyReferences.contains(beanName)) {
+            return wrapIfNecessary(bean, beanName);
+        }
+
+        return bean;
+    }
+
+    /**
+     * Wrap the given bean if necessary, i.e. if it is eligible for being proxied.
+     *
+     * @param bean the raw bean instance
+     * @param beanName the name of the bean
+     * @return a proxy wrapping the bean, or the raw bean instance as-is
+     */
+    protected Object wrapIfNecessary(Object bean, String beanName) {
         Class<?> beanClass = bean.getClass();
         if (isInfrastructureClass(beanClass)) {
-            return null;
+            return bean;
         }
 
         Collection<AspectJExpressionPointcutAdvisor> advisors = beanFactory.getBeansOfType(AspectJExpressionPointcutAdvisor.class).values();
@@ -88,12 +112,19 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
             advisedSupport.setTargetSource(targetSource);
             advisedSupport.setMethodInterceptor((MethodInterceptor) advisor.getAdvice());
             advisedSupport.setMethodMatcher(advisor.getPointcut().getMethodMatcher());
-            advisedSupport.setProxyTargetClass(false);
+            advisedSupport.setProxyTargetClass(true);
 
             //返回代理对象
             return new ProxyFactory(advisedSupport).getProxy();
         }
+
         return bean;
+    }
+
+    @Override
+    public Object getEarlyBeanReference(Object bean, String beanName) {
+        earlyProxyReferences.add(beanName);
+        return wrapIfNecessary(bean, beanName);
     }
 
     @Override

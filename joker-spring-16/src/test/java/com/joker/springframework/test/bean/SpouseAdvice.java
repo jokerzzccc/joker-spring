@@ -12,11 +12,11 @@ import java.lang.reflect.Method;
  * @author jokerzzccc
  * @date 2022/10/6
  */
-public class UserServiceBeforeAdvice implements MethodBeforeAdvice {
+public class SpouseAdvice implements MethodBeforeAdvice {
 
     @Override
     public void before(Method method, Object[] args, Object target) throws Throwable {
-        System.out.println("beforeAdvice 拦截方法：" + method.getName());
+        System.out.println("关怀小两口(切面)：" + method);
     }
 
 }

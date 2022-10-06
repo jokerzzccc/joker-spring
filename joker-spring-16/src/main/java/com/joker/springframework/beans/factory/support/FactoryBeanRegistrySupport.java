@@ -42,7 +42,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
     protected Object doGetObjectFromFactoryBean(final FactoryBean factory, final String beanName) {
         try {
             return factory.getObject();
-        } catch (BeanException e) {
+        } catch (Exception e) {
             throw new BeansException("FactoryBean threw exception on  object: [" + beanName + "] creation", e);
         }
     }

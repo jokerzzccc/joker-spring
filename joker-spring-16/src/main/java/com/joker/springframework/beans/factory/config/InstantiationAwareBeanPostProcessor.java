@@ -38,7 +38,6 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
      * <p>
      * 在 Bean 对象执行初始化方法之后，执行此方法
      *
-     *
      * @param bean
      * @param beanName
      * @return
@@ -60,5 +59,19 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
      * @throws BeansException
      */
     PropertyValues postProcessPropertyValues(PropertyValues pvs, Object bean, String beanName) throws BeansException;
+
+    /**
+     * Obtain a reference for early access to the specified bean,
+     * typically for the purpose of resolving a circular reference.
+     * <p>
+     * 在 Spring 中由 SmartInstantiationAwareBeanPostProcessor#getEarlyBeanReference 提供
+     *
+     * @param bean
+     * @param beanName
+     * @return
+     */
+    default Object getEarlyBeanReference(Object bean, String beanName) {
+        return bean;
+    }
 
 }

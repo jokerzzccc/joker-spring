@@ -15,7 +15,7 @@ import cn.hutool.core.bean.BeanException;
  */
 public interface FactoryBean<T> {
 
-    T getObject() throws BeanException;
+    T getObject() throws Exception;
 
     Class<?> getObjectType();
 
