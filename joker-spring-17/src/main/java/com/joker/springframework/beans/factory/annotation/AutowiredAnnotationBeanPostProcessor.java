@@ -1,12 +1,14 @@
 package com.joker.springframework.beans.factory.annotation;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.TypeUtil;
 import com.joker.springframework.beans.BeansException;
 import com.joker.springframework.beans.PropertyValues;
 import com.joker.springframework.beans.factory.BeanFactory;
 import com.joker.springframework.beans.factory.BeanFactoryAware;
 import com.joker.springframework.beans.factory.ConfigurableListableBeanFactory;
 import com.joker.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
+import com.joker.springframework.core.convert.ConversionService;
 import com.joker.springframework.util.ClassUtils;
 
 import java.lang.reflect.Field;
@@ -38,8 +40,19 @@ public class AutowiredAnnotationBeanPostProcessor implements InstantiationAwareB
         for (Field field : declaredFields) {
             Value valueAnnotation = field.getAnnotation(Value.class);
             if (null != valueAnnotation) {
-                String value = valueAnnotation.value();
-                value = beanFactory.resolveEmbeddedValue(value);
+                Object value = valueAnnotation.value();
+                value = beanFactory.resolveEmbeddedValue((String) value);
+
+                // 类型转换
+                Class<?> sourceType = value.getClass();
+                Class<?> targetType = (Class<?>) TypeUtil.getType(field);
+                ConversionService conversionService = beanFactory.getConversionService();
+                if (conversionService != null) {
+                    if (conversionService.canConvert(sourceType, targetType)) {
+                        value = conversionService.convert(value, targetType);
+                    }
+                }
+
                 BeanUtil.setFieldValue(bean, field.getName(), value);
             }
         }

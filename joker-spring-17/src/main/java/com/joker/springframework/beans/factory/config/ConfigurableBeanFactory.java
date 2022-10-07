@@ -2,7 +2,9 @@ package com.joker.springframework.beans.factory.config;
 
 import com.joker.springframework.beans.BeansException;
 import com.joker.springframework.beans.factory.HierarchicalBeanFactory;
+import com.joker.springframework.core.convert.ConversionService;
 import com.joker.springframework.util.StringValueResolver;
+import com.sun.istack.internal.Nullable;
 
 /**
  * <p>
@@ -41,5 +43,19 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
      * @since 3.0
      */
     String resolveEmbeddedValue(String value);
+
+    /**
+     * Specify a Spring 3.0 ConversionService to use for converting
+     * property values, as an alternative to JavaBeans PropertyEditors.
+     * @since 3.0
+     */
+    void setConversionService(ConversionService conversionService);
+
+    /**
+     * Return the associated ConversionService, if any.
+     * @since 3.0
+     */
+    @Nullable
+    ConversionService getConversionService();
 
 }

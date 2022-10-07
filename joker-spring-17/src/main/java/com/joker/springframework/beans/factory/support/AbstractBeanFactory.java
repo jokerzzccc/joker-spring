@@ -5,6 +5,7 @@ import com.joker.springframework.beans.factory.FactoryBean;
 import com.joker.springframework.beans.factory.config.BeanDefinition;
 import com.joker.springframework.beans.factory.config.BeanPostProcessor;
 import com.joker.springframework.beans.factory.config.ConfigurableBeanFactory;
+import com.joker.springframework.core.convert.ConversionService;
 import com.joker.springframework.util.ClassUtils;
 import com.joker.springframework.util.StringValueResolver;
 
@@ -35,6 +36,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
      * String resolvers to apply e.g. to annotation attribute values
      */
     private final List<StringValueResolver> embeddedValueResolvers = new ArrayList<>();
+
+    private ConversionService conversionService;
 
     @Override
     public Object getBean(String name) throws BeansException {
@@ -98,6 +101,16 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
             result = resolver.resolveStringValue(result);
         }
         return result;
+    }
+
+    @Override
+    public void setConversionService(ConversionService conversionService) {
+        this.conversionService = conversionService;
+    }
+
+    @Override
+    public ConversionService getConversionService() {
+        return conversionService;
     }
 
     /**

@@ -1,8 +1,10 @@
 package com.joker.springframework.test;
 
 import com.joker.springframework.context.support.ClassPathXmlApplicationContext;
+import com.joker.springframework.core.convert.converter.Converter;
+import com.joker.springframework.core.convert.support.StringToNumberConverterFactory;
 import com.joker.springframework.test.bean.Husband;
-import com.joker.springframework.test.bean.Wife;
+import com.joker.springframework.test.converter.StringToIntegerConverter;
 import org.junit.Test;
 
 /**
@@ -11,17 +13,29 @@ import org.junit.Test;
  */
 public class ApiTest {
 
-    /**
-     * 测试循环依赖:
-     * husband 依赖 wife ，wife 依赖 husband 和 mother，最后是关于 AOP 切面的依赖使用
-     */
     @Test
-    public void test_circular() {
+    public void test_convert() {
         ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
         Husband husband = applicationContext.getBean("husband", Husband.class);
-        Wife wife = applicationContext.getBean("wife", Wife.class);
-        System.out.println("老公的媳妇：" + husband.queryWife());
-        System.out.println("媳妇的老公：" + wife.queryHusband());
+        System.out.println("convert 融入 Spring 的测试结果：" + husband);
+    }
+
+    @Test
+    public void test_StringToIntegerConverter() {
+        StringToIntegerConverter converter = new StringToIntegerConverter();
+        Integer num = converter.convert("1234");
+        System.out.println("StringToIntegerConverter 测试结果：" + num);
+    }
+
+    @Test
+    public void test_StringToNumberConverterFactory() {
+        StringToNumberConverterFactory converterFactory = new StringToNumberConverterFactory();
+
+        Converter<String, Integer> stringToIntegerConverter = converterFactory.getConverter(Integer.class);
+        System.out.println("stringToIntegerConverter 测试结果：" + stringToIntegerConverter.convert("1234"));
+
+        Converter<String, Long> stringToLongConverter = converterFactory.getConverter(Long.class);
+        System.out.println("stringToLongConverter 测试结果：" + stringToLongConverter.convert("1234"));
     }
 
 }

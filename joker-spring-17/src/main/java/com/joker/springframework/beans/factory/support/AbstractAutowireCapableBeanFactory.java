@@ -3,14 +3,17 @@ package com.joker.springframework.beans.factory.support;
 import cn.hutool.core.bean.BeanException;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.TypeUtil;
 import com.joker.springframework.beans.BeansException;
 import com.joker.springframework.beans.PropertyValue;
 import com.joker.springframework.beans.PropertyValues;
 import com.joker.springframework.beans.factory.*;
 import com.joker.springframework.beans.factory.config.*;
+import com.joker.springframework.core.convert.ConversionService;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 /**
  * Abstract bean factory superclass that implements default bean creation,
@@ -226,6 +229,18 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                     BeanReference beanReference = (BeanReference) value;
                     value = getBean(beanReference.getBeanName());
                 }
+                // 类型转换
+                else {
+                    final Class<?> sourceType = value.getClass();
+                    final Class<?> targetType = (Class<?>) TypeUtil.getFieldType(bean.getClass(), name);
+                    ConversionService conversionService = getConversionService();
+                    if (null != conversionService) {
+                        if (conversionService.canConvert(sourceType, targetType)) {
+                            value = conversionService.convert(value, targetType);
+                        }
+                    }
+                }
+
                 // 属性填充
                 BeanUtil.setFieldValue(bean, name, value);
             }
@@ -274,7 +289,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     private void invokeInitMethods(String beanName, Object bean, BeanDefinition beanDefinition) throws Exception {
         // 1. 实现接口 InitializingBean
         if (bean instanceof InitializingBean) {
-            ((InitializingBean) bean).addPropertiesSet();
+            ((InitializingBean) bean).afterPropertiesSet();
         }
         // 2. 配置信息 init-method (判断是为了避免二次执行销毁）
         String initMethodName = beanDefinition.getInitMethodName();
