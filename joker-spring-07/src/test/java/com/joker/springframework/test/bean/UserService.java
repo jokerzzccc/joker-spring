@@ -31,8 +31,8 @@ public class UserService implements InitializingBean, DisposableBean {
     }
 
     @Override
-    public void addPropertiesSet() throws Exception {
-        System.out.println("执行：UserService.addPropertiesSet");
+    public void afterPropertiesSet() throws Exception {
+        System.out.println("执行：UserService.afterPropertiesSet");
     }
 
     public String getuId() {

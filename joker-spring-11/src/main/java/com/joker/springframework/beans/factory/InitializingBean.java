@@ -17,6 +17,6 @@ public interface InitializingBean {
      *
      * @throws BeansException
      */
-    void addPropertiesSet() throws Exception;
+    void afterPropertiesSet() throws Exception;
 
 }
